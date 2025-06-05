@@ -1,0 +1,202 @@
+/* In your global CSS file (index.css or App.css) */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+* {
+  box-sizing: border-box; /* Include padding/border in width calculations */
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  width: 100vw; /* Use 100% instead of 100vw */
+  max-width: 100vw; /* Prevent overflow */
+  overflow-x: hidden; /* Only hide horizontal overflow */
+}
+
+.app.light {
+    background: 
+    linear-gradient(
+      90deg,
+      #c2cbee 3%,
+      #e9dedefa 10%,
+      #f5f5f8 25%,
+      #f5f5f8 75%,
+      #e9dedefa 90%,
+      #c2cbee 97%
+    ),
+    radial-gradient(
+      120% 90% at 50% 20%,
+      transparent 40%,
+      rgba(10, 15, 36, 0.6) 85%,
+      #0a0f24 100%
+    );
+  color: #333;
+}
+
+.app.dark {
+  background: 
+    linear-gradient(
+      90deg,
+      #0a0f24 3%,
+      #0a0f2480 10%,
+      #0a0f2400 25%,
+      #0a0f2400 75%,
+      #0a0f2480 90%,
+      #0a0f24 97%
+    ),
+    radial-gradient(
+      120% 90% at 50% 20%,
+      transparent 40%,
+      rgba(10, 15, 36, 0.6) 85%,
+      #0a0f24 100%
+    );
+  color: #e6f1ff;
+}
+
+
+main {
+  flex: 1;
+  /* padding: 0 2rem; */
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Section styling */
+section {
+  padding: 5rem 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.section-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.app.light .section-title::after {
+  background-color: #3498db;
+}
+
+.app.dark .section-title::after {
+  background-color: #64ffda;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* Highlight text */
+.highlight {
+  position: relative;
+  display: inline-block;
+  font-size: 1rem;
+  /* background-color: #0a0f24; */
+}
+
+.app.light .highlight::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: rgba(52, 152, 219, 0.3);
+  z-index: 1;
+}
+
+.app.dark .highlight::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: rgba(100, 255, 218, 0.3);
+  z-index: 1;
+}
+
+/* Buttons */
+.cta-button {
+  padding: 0.8rem 1.8rem;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin: 0.5rem;
+}
+
+.app.light .cta-button {
+  background-color: #18191a;
+  color: white;
+}
+
+.app.dark .cta-button {
+  background-color: #0d1c3d;
+  color: #eaedf2;
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.cta-button.secondary {
+  background-color: transparent;
+  border: 2px solid;
+}
+
+.app.light .cta-button.secondary {
+  border-color: #3498db;
+  color: #3498db;
+}
+
+.app.dark .cta-button.secondary {
+  border-color: #64ffda;
+  color: #64ffda;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  main {
+    padding: 0 1rem;
+  }
+  
+  section {
+    padding: 3rem 0;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+}

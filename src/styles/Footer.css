@@ -1,0 +1,164 @@
+.footer {
+  padding: 3rem 0 1rem;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.app.dark .footer-logo {
+  color: #64ffda;
+}
+
+.app.light .footer-logo {
+  color: #3498db;
+}
+
+.footer-text {
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.footer-social {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-social .social-icon {
+  font-size: 1.5rem;
+}
+
+.links-title, .newsletter-title {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.footer-links ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.footer-links a {
+  transition: color 0.3s ease;
+}
+
+.app.dark .footer-links a {
+  color: #a8b2d1;
+}
+
+.app.light .footer-links a {
+  color: #666;
+}
+
+.app.dark .footer-links a:hover {
+  color: #64ffda;
+}
+
+.app.light .footer-links a:hover {
+  color: #3498db;
+}
+
+.newsletter-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.newsletter-form input {
+  flex: 1;
+  padding: 0.8rem;
+  border-radius: 4px;
+  border: none;
+}
+
+.app.dark .newsletter-form input {
+  background-color: #233554;
+  color: #e6f1ff;
+}
+
+.app.light .newsletter-form input {
+  background-color: #e9ecef;
+  color: #333;
+}
+
+.newsletter-form button {
+  padding: 0 1.5rem;
+  border-radius: 4px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.app.dark .newsletter-form button {
+  background-color: #64ffda;
+  color: #0a192f;
+}
+
+.app.light .newsletter-form button {
+  background-color: #3498db;
+  color: white;
+}
+
+.newsletter-form button:hover {
+  transform: translateY(-2px);
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid;
+}
+
+.app.dark .footer-bottom {
+  border-color: #233554;
+  color: #a8b2d1;
+}
+
+.app.light .footer-bottom {
+  border-color: #ddd;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .footer-content {
+    text-align: center;
+    align-items: center;
+  }
+  
+  .footer-social {
+    justify-content: center;
+  }
+  
+  .footer-links, .footer-newsletter {
+    text-align: center;
+  }
+  
+  .footer-links ul {
+    align-items: center;
+  }
+}
