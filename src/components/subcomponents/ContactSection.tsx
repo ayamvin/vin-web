@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HiOutlineMail, HiOutlineUser, HiOutlineDocumentText } from 'react-icons/hi';
 import '../../styles/ContactSection.css';
 import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
+import emailjs from 'emailjs-com';
+
+// Initialize EmailJS with your User ID
+emailjs.init('nwRKOThRBYBuK42bo'); //user_id
 
 const ContactSection: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -9,13 +13,16 @@ const ContactSection: React.FC = () => {
     email: '',
     message: ''
   });
+  
   const [errors, setErrors] = useState({
     name: '',
     email: '',
     message: ''
   });
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -66,23 +73,49 @@ const ContactSection: React.FC = () => {
     return valid;
   };
 
+  const sendEmail = async (data: typeof formData) => {
+    try {
+      const templateParams = {
+        from_name: data.name,
+        from_email: data.email,
+        to_email: 'manalangmalvin@gmail.com',
+        message: data.message,
+        date: new Date().toLocaleString()
+      };
+      
+    // And in the sendEmail function:
+    const response = await emailjs.send(
+      'service_b3ew6lf', //service_id
+      'template_rinebzm', //template_id
+      templateParams
+    );
+      
+      return response.status === 200;
+    } catch (error) {
+      console.error('Email sending failed:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validate()) return;
     
     setIsSubmitting(true);
+    setSubmitMessage('');
     
     try {
-      // In a real app, you would send the form data to your backend or EmailJS
-      console.log('Form submitted:', formData);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const success = await sendEmail(formData);
       
-      setSubmitMessage('Thank you! Your message has been sent successfully.');
-      setFormData({ name: '', email: '', message: '' });
+      if (success) {
+        setSubmitMessage('Thank you! Your message has been sent successfully.');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        setSubmitMessage('Sorry, something went wrong. Please try again later.');
+      }
     } catch (error) {
-      setSubmitMessage('Sorry, something went wrong. Please try again later.');
+      setSubmitMessage('Sorry, an unexpected error occurred. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }
@@ -142,12 +175,25 @@ const ContactSection: React.FC = () => {
             {errors.message && <span className="error-message">{errors.message}</span>}
           </div>
           
-          <button type="submit" className="submit-button" disabled={isSubmitting}>
-            {isSubmitting ? 'Sending...' : 'Send Message'}
+          <button 
+            type="submit" 
+            className="submit-button" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <span className="spinner"></span>
+                Sending...
+              </>
+            ) : (
+              'Send Message'
+            )}
           </button>
           
           {submitMessage && (
-            <div className={`submit-message ${submitMessage.includes('Thank you') ? 'success' : 'error'}`}>
+            <div className={`submit-message ${
+              submitMessage.includes('Thank you') ? 'success' : 'error'
+            }`}>
               {submitMessage}
             </div>
           )}
@@ -159,7 +205,7 @@ const ContactSection: React.FC = () => {
           
           <div className="info-item">
             <HiOutlineMail className="info-icon" />
-            <span>john.doe@example.com</span>
+            <span>manalangmalvin@gmail.com</span>
           </div>
           
           <div className="social-links">

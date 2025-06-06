@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-content">
-          <div className="footer-logo">John Doe</div>
+          <div className="footer-logo">Malvin Manalang</div>
           <p className="footer-text">
             Full Stack Developer creating modern web applications with cutting-edge technologies.
           </p>
@@ -50,7 +50,7 @@ const Footer: React.FC = () => {
       </div>
       
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} John Doe. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Malvin Manalang. All rights reserved.</p>
       </div>
     </footer>
   );
