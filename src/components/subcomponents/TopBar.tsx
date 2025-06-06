@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-scroll';
 import { useTheme } from '../context/ThemeContext';
 import { FiMoon, FiSun } from 'react-icons/fi';
+import { FaGamepad } from 'react-icons/fa'; // Import gamepad icon
 import '../../styles/TopBar.css';
+import SplashCursor from '../ReactBits/SplashCursor';
 
 const TopBar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const [showCursor, setShowCursor] = useState(false); // State for cursor toggle
 
-  // Define navigation items for cleaner code
   const navItems = [
     { id: 'hero', label: 'Home' },
     { id: 'projects', label: 'Projects' },
@@ -16,8 +18,13 @@ const TopBar: React.FC = () => {
     { id: 'contact', label: 'Contact' },
   ];
 
+  const toggleCursor = () => {
+    setShowCursor(prev => !prev);
+  };
+
   return (
     <nav className={`topbar ${theme}`}>
+      {showCursor && <SplashCursor />}
       <div className="topbar-container">
         <Link 
           to="hero" 
@@ -37,23 +44,34 @@ const TopBar: React.FC = () => {
               className="nav-link"
               activeClass="active"
               spy={true}
-              offset={-70} // Adjust this based on your header height
+              offset={-70}
             >
               {item.label}
             </Link>
           ))}
         </div>
-        <button 
-          onClick={toggleTheme} 
-          className="theme-toggle"
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        >
-          {theme === 'dark' ? (
-            <FiSun size={20} className="theme-icon" />
-          ) : (
-            <FiMoon size={20} className="theme-icon" />
-          )}
-        </button>
+        <div className="topbar-buttons">
+          <button 
+            onClick={toggleCursor} 
+            className="cursor-toggle"
+            aria-label={`${showCursor ? 'Disable' : 'Enable'} splash cursor`}
+            data-active={showCursor}
+          >
+            <FaGamepad size={16} className="cursor-icon" />
+            <span>Play Me!</span>
+          </button>
+          <button 
+            onClick={toggleTheme} 
+            className="theme-toggle"
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? (
+              <FiSun size={20} className="theme-icon" />
+            ) : (
+              <FiMoon size={20} className="theme-icon" />
+            )}
+          </button>
+        </div>
       </div>
     </nav>
   );

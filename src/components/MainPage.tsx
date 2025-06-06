@@ -6,7 +6,6 @@ import SkillsSection from './subcomponents/SkillsSection';
 import ResumeSection from './subcomponents/ResumeSection';
 import ContactSection from './subcomponents/ContactSection';
 import Footer from './subcomponents/FooterSection';
-import SplashCursor from './ReactBits/SplashCursor';
 import { ThemeContext } from './context/ThemeContext'; // no .tsx extension needed
 import '../styles/MainPage.css';
 
@@ -22,7 +21,6 @@ const MainPage: React.FC = () => {
       <div className={`app ${theme}`}>
         <TopBar />
         <main>
-          <SplashCursor />
           <HeroSection />
           <ProjectsSection />
           <SkillsSection />

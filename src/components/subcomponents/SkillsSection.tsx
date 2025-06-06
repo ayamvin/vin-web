@@ -1,35 +1,105 @@
-import React from 'react';
-import SkillItem from './SkillItem.tsx';
+import React, { useEffect, useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTheme } from '../context/ThemeContext';
 import '../../styles/SkillsSection.css';
 
-const skills = [
-  { name: 'JavaScript', level: 90, icon: 'js' },
-  { name: 'TypeScript', level: 85, icon: 'ts' },
-  { name: 'React', level: 90, icon: 'react' },
-  { name: 'Node.js', level: 80, icon: 'node' },
-  { name: 'HTML/CSS', level: 95, icon: 'html' },
-  { name: 'Python', level: 75, icon: 'python' },
-  { name: 'SQL', level: 80, icon: 'sql' },
-  { name: 'Git', level: 85, icon: 'git' },
-];
+// Language colors for the cards
+const languageColors: Record<string, string> = {
+  'JavaScript': '#f0db4f',
+  'TypeScript': '#3178c6',
+  'React': '#61dafb',
+  'Node.js': '#68a063',
+  'HTML/CSS': '#e34c26',
+  'Python': '#3776ab',
+  'SQL': '#f29111',
+  'Git': '#f14e32'
+};
+
+interface Skills {
+  name: string;
+  years: number;
+  icon: string;
+}
 
 const SkillsSection: React.FC = () => {
+  const { theme } = useTheme();
+  const [skills, setSkills] = useState<Skills[]>([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3001/api/skills')
+      .then((res) => res.json())
+      .then((data) => setSkills(data))
+      .catch((err) => console.error('Failed to fetch skills:', err));
+  }, []);
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className={`custom-tooltip ${theme}`}>
+          <p className="tooltip-label">{payload[0].payload.name}</p>
+          <p className="tooltip-value">{payload[0].value} years</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <section id="skills" className="skills-section">
       <div className="section-header">
-        <h2 className="section-title">My Skills</h2>
-        <p className="section-subtitle">Technologies I work with</p>
+        <h2 className="section-title">My Experience</h2>
+        <p className="section-subtitle">Years working with each technology</p>
       </div>
-      
-      <div className="skills-container">
-        {skills.map((skill, index) => (
-          <SkillItem 
-            key={index}
-            name={skill.name}
-            level={skill.level}
-            icon={skill.icon}
-          />
+
+      {/* New Language Cards Container */}
+      <div className="language-cards-container">
+        {skills.map((skills) => (
+          <div 
+            key={skills.name}
+            className="language-card"
+            style={{ backgroundColor: languageColors[skills.name] }}
+          >
+            <div className="language-icon">
+              {/* Replace with your actual icon component or img tag */}
+              <span className={`icon-${skills.icon}`}>{skills.icon}</span>
+            </div>
+            <div className="language-name">{skills.name}</div>
+          </div>
         ))}
+      </div>
+
+      {/* Existing Bar Chart */}
+      <div className="chart-container">
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart
+            data={skills}
+            layout="vertical"
+            margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
+          >
+            <XAxis 
+              type="number" 
+              domain={[0, 2.5]} 
+              tick={{ fill: theme === 'dark' ? '#ccd6f6' : '#333' }}
+              tickFormatter={(value) => `${value}y`}
+            />
+            <YAxis 
+              type="category" 
+              dataKey="name" 
+              tick={{ fill: theme === 'dark' ? '#ccd6f6' : '#333' }}
+              width={100}
+            />
+            <Tooltip 
+              content={<CustomTooltip />}
+              cursor={{ fill: theme === 'dark' ? 'rgba(100, 255, 218, 0.1)' : 'rgba(52, 152, 219, 0.1)' }}
+            />
+            <Bar
+              dataKey="years"
+              name="Experience"
+              animationDuration={1500}
+              fill={theme === 'dark' ? '#64ffda' : '#3498db'}
+              radius={[0, 4, 4, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </section>
   );

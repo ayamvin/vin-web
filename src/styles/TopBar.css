@@ -113,7 +113,11 @@
 .nav-link:hover::after {
   width: 100%;
 }
-
+.topbar-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 .theme-toggle {
   background: none;
   border: none;
@@ -137,6 +141,51 @@
 .theme-toggle:hover {
   transform: scale(1.1);
 }
+
+/* Cursor toggle button */
+.cursor-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Light theme styles */
+.topbar.light .cursor-toggle {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.topbar.light .cursor-toggle:hover {
+  background-color: #e0e0e0;
+}
+
+.topbar.light .cursor-toggle[data-active="true"] {
+  background-color: #3498db;
+  color: white;
+}
+
+/* Dark theme styles */
+.topbar.dark .cursor-toggle {
+  background-color: #2d3748;
+  color: #f8f9fa;
+}
+
+.topbar.dark .cursor-toggle:hover {
+  background-color: #4a5568;
+}
+
+.topbar.dark .cursor-toggle[data-active="true"] {
+  background-color: #64ffda;
+  color: #0a192f;
+}
+
 
 @media (max-width: 768px) {
   .topbar {

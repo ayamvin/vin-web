@@ -1,14 +1,125 @@
 .skills-section {
-  padding-top: 100px;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 20px 0 20px;
+  border-bottom: 1px solid rgb(160, 12, 88);
+  /* border: 1px solid wheat; */
 }
 
 .skills-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  border: 1px solid wheat;
+}
+/* Chart container */
+.chart-container {
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid rgb(160, 12, 88);
+  box-shadow: 0 10px 20px rgb(0, 0, 0, 0.5);
+  border-radius: 15px;
 }
 
+/* Tooltip styling */
+.custom-tooltip {
+  padding: 0.75rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid wheat;
+}
+
+.custom-tooltip.dark {
+  background: #112240;
+  border: 1px solid #64ffda;
+}
+
+.custom-tooltip.light {
+  background: white;
+  border: 1px solid #3498db;
+}
+
+.tooltip-label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.custom-tooltip.dark .tooltip-label {
+  color: #64ffda;
+}
+
+.custom-tooltip.light .tooltip-label {
+  color: #3498db;
+}
+
+.tooltip-value {
+  font-size: 0.9rem;
+}
+/* Language Cards Container */
+.language-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin: 2rem auto;
+  max-width: 800px;
+}
+
+.language-card {
+  width: 150px;
+  height: 80px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transition: transform 0.2s ease;
+  border: 1px solid rgb(52, 180, 189);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.language-card:hover {
+  transform: translateY(-3px);
+}
+
+.language-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.language-name {
+  font-size: 12px;
+  color: white;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Dark mode adjustments */
+.skills-section.dark .language-card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Existing chart styles */
+.chart-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 0.5rem;
+    height: 300px;
+  }
+  
+  .skills-section .section-header {
+    padding: 0 1rem;
+  }
+}
 @media (max-width: 768px) {
   .skills-container {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
