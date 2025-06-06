@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FaDownload, FaEye, FaTimes, FaPaperPlane } from 'react-icons/fa';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -16,15 +16,55 @@ const ResumeSection: React.FC = () => {
   const [messages, setMessages] = useState<Array<{ text: string; sender: 'user' | 'bot' }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [pdfLoadError, setPdfLoadError] = useState<string | null>(null);
+  const [isBotTyping, setIsBotTyping] = useState(false);
+  const [typingMessage, setTypingMessage] = useState('');
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleDownload = () => {
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages, typingMessage]);
+
+  const typeMessage = (message: string, onComplete: () => void) => {
+    let i = 0;
+    setTypingMessage('');
+    const typingInterval = setInterval(() => {
+      if (i < message.length) {
+        setTypingMessage(prev => prev + message.charAt(i));
+        i++;
+      } else {
+        clearInterval(typingInterval);
+        onComplete();
+      }
+    }, 20);
+  };
+
+  const handleDownload = async () => {
     const link = document.createElement('a');
     link.href = resumeFile;
     link.download = 'Manalang_Resume.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    try {
+      const response = await fetch('http://localhost:3001/api/track-download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: 'user-session-id',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error tracking download:', error);
+    }
   };
 
   const toggleModal = () => {
@@ -41,37 +81,40 @@ const ResumeSection: React.FC = () => {
     setPdfLoadError('Failed to load PDF file. Please try downloading instead.');
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
 
-    const newMessages = [...messages, { text: inputMessage, sender: 'user' as const }];
-    setMessages(newMessages);
+    const userMessage = { text: inputMessage, sender: 'user' as const };
+    setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
+    setIsBotTyping(true);
 
-    setTimeout(() => {
-      setMessages([...newMessages, { 
-        text: getBotResponse(inputMessage), 
-        sender: 'bot' as const 
-      }]);
-      if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-      }
-    }, 1000);
-  };
+    try {
+      const response = await fetch('http://localhost:3001/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: 'example-session-id',
+          message: inputMessage,
+        }),
+      });
 
-  const getBotResponse = (question: string): string => {
-    const lowerQuestion = question.toLowerCase();
-    if (lowerQuestion.includes('experience') || lowerQuestion.includes('work')) {
-      return "The candidate has 5 years of experience in web development, with expertise in React, TypeScript, and Node.js. They've worked at several tech companies leading frontend development teams.";
-    } else if (lowerQuestion.includes('skill') || lowerQuestion.includes('technology')) {
-      return "Key skills include: React, TypeScript, JavaScript, Node.js, HTML/CSS, Python, and cloud technologies like AWS. They're also proficient in UI/UX design principles.";
-    } else if (lowerQuestion.includes('education') || lowerQuestion.includes('degree')) {
-      return "The candidate holds a Bachelor's degree in Computer Science from a reputable university, graduating with honors.";
-    } else if (lowerQuestion.includes('contact') || lowerQuestion.includes('email')) {
-      return "You can contact the candidate via email at example@email.com or through their LinkedIn profile.";
-    } else {
-      return "I can provide information about the candidate's experience, skills, education, and contact details. Please ask about any of these aspects of their resume.";
+      const data = await response.json();
+
+      setTimeout(() => {
+        setIsBotTyping(false);
+        typeMessage(data.response, () => {
+          setMessages(prev => [...prev, { text: data.response, sender: 'bot' as const }]);
+          setTypingMessage('');
+        });
+      }, 1000 + Math.random() * 1000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setIsBotTyping(false);
+      setMessages(prev => [...prev, { text: "Sorry, I encountered an error. Please try again.", sender: 'bot' as const }]);
     }
   };
 
@@ -144,11 +187,27 @@ const ResumeSection: React.FC = () => {
                 </ul>
               </div>
             ) : (
-              messages.map((message, index) => (
-                <div key={index} className={`chat-message ${message.sender}`}>
-                  {message.text}
-                </div>
-              ))
+              <>
+                {messages.map((message, index) => (
+                  <div key={index} className={`chat-message ${message.sender}`}>
+                    {message.text}
+                  </div>
+                ))}
+                {isBotTyping && (
+                  <div className="chat-message bot">
+                    <div className="typing-indicator">
+                      <span className="dot"></span>
+                      <span className="dot"></span>
+                      <span className="dot"></span>
+                    </div>
+                  </div>
+                )}
+                {typingMessage && (
+                  <div className="chat-message bot">
+                    {typingMessage}
+                  </div>
+                )}
+              </>
             )}
           </div>
           
@@ -208,5 +267,5 @@ const ResumeSection: React.FC = () => {
     </section>
   );
 };
-// default
+
 export default ResumeSection;
