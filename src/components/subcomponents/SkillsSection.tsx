@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
 import '../../styles/SkillsSection.css';
+import { supabase } from './supabaseClient.ts';
 
 // Language colors for the cards
 const languageColors: Record<string, string> = {
@@ -26,11 +27,21 @@ const SkillsSection: React.FC = () => {
   const [skills, setSkills] = useState<Skills[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/skills')
-      .then((res) => res.json())
-      .then((data) => setSkills(data))
-      .catch((err) => console.error('Failed to fetch skills:', err));
+    const fetchSkills = async () => {
+      const { data, error } = await supabase
+        .from('skills') // your table name in Supabase
+        .select('*');
+
+      if (error) {
+        console.error('Failed to fetch skills:', error.message);
+      } else {
+        setSkills(data as Skills[]);
+      }
+    };
+
+    fetchSkills();
   }, []);
+  
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (

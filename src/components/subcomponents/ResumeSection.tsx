@@ -5,26 +5,54 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import '../../styles/ResumeSection.css';
 import resumeFile from '../../assets/pdf/resumeManalang.pdf';
+import { supabase } from './supabaseClient.ts';
 
 // Configure pdf.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
+interface Message {
+  content: string;
+  sender_type: 'user' | 'bot';
+  created_at: string;
+}
 
 const ResumeSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [messages, setMessages] = useState<Array<{ text: string; sender: 'user' | 'bot' }>>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [pdfLoadError, setPdfLoadError] = useState<string | null>(null);
   const [isBotTyping, setIsBotTyping] = useState(false);
   const [typingMessage, setTypingMessage] = useState('');
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const sessionId = 'user-session-id'; // In a real app, generate or get this dynamically
 
+  // Scroll to bottom of chat
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages, typingMessage]);
+
+  // Fetch conversation history on mount
+  useEffect(() => {
+    const fetchConversationHistory = async () => {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('content, sender_type, created_at')
+        .eq('conversation.user_id.session_id', sessionId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching conversation history:', error);
+      } else {
+        setMessages(data as Message[]);
+      }
+    };
+
+    fetchConversationHistory();
+  }, []);
 
   const typeMessage = (message: string, onComplete: () => void) => {
     let i = 0;
@@ -49,18 +77,33 @@ const ResumeSection: React.FC = () => {
     document.body.removeChild(link);
 
     try {
-      const response = await fetch('http://localhost:3001/api/track-download', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId: 'user-session-id',
-        }),
-      });
+      // Get or create user
+      let { data: user } = await supabase
+        .from('users')
+        .select('id')
+        .eq('session_id', sessionId)
+        .single();
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!user) {
+        const { data: newUser } = await supabase
+          .from('users')
+          .insert({ session_id: sessionId, ip_address: 'unknown', user_agent: navigator.userAgent })
+          .select('id')
+          .single();
+        user = newUser;
+      }
+
+      // Track download
+      if (user) {
+        await supabase
+          .from('resume_downloads')
+          .insert({
+            user_id: user.id,
+            ip_address: 'unknown',
+            user_agent: navigator.userAgent,
+          });
+      } else {
+        console.error('User not found or creation failed');
       }
     } catch (error) {
       console.error('Error tracking download:', error);
@@ -81,40 +124,104 @@ const ResumeSection: React.FC = () => {
     setPdfLoadError('Failed to load PDF file. Please try downloading instead.');
   };
 
+  const getBotResponse = async (message: string): Promise<string> => {
+    const lowerMessage = message.toLowerCase();
+
+    // Check bot_responses table
+    const { data: responseData } = await supabase
+      .from('bot_responses')
+      .select('response_text')
+      .contains('trigger_phrases', [lowerMessage])
+      .order('trigger_phrases', { ascending: false })
+      .limit(1);
+
+    if (responseData && responseData.length > 0) {
+      return responseData[0].response_text;
+    }
+
+    // Fallback responses
+    if (lowerMessage.includes("name") || lowerMessage.includes("hi") || lowerMessage.includes("hello")) {
+      return "Hi I'm Malvin A. Manalang, nice to meet you!";
+    } else if (lowerMessage.includes("age")) {
+      return "I'm currently in my early 20s.";
+    } else if (lowerMessage.includes("contact") || lowerMessage.includes("email") || lowerMessage.includes("phone")) {
+      return "You can contact me via email at manalangmalvin@gmail.com or reach me by phone at 0916-299-1409.";
+    }
+
+    return "I'm happy to answer questions about my experience, projects, skills, education, or anything else from my resume. Just ask!";
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
 
-    const userMessage = { text: inputMessage, sender: 'user' as const };
+    const userMessage = { content: inputMessage, sender_type: 'user' as const, created_at: new Date().toISOString() };
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsBotTyping(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId: 'example-session-id',
-          message: inputMessage,
-        }),
-      });
+      // Get or create user
+      let { data: user } = await supabase
+        .from('users')
+        .select('id')
+        .eq('session_id', sessionId)
+        .single();
 
-      const data = await response.json();
+      if (!user) {
+        const { data: newUser } = await supabase
+          .from('users')
+          .insert({ session_id: sessionId, ip_address: 'unknown', user_agent: navigator.userAgent })
+          .select('id')
+          .single();
+        user = newUser;
+      }
+      if (!user) {
+      console.error('User is null');
+      return;
+}
+
+      // Create conversation
+      const { data: conversation } = await supabase
+        .from('conversations')
+        .insert({ user_id: user.id })
+        .select('id')
+        .single();
+
+      // Save user message
+      if (conversation) { 
+        await supabase
+          .from('messages')
+          .insert({
+            conversation_id: conversation.id,
+            content: inputMessage,
+            sender_type: 'user',
+          });
+      } else {
+        console.error('Conversation not created');
+      }
+      // Get and save bot response
+      const botResponse = await getBotResponse(inputMessage);
+      
+      await supabase
+        .from('messages')
+        .insert({
+          conversation_id: conversation!.id,
+          content: botResponse,
+          sender_type: 'bot',
+        });
 
       setTimeout(() => {
         setIsBotTyping(false);
-        typeMessage(data.response, () => {
-          setMessages(prev => [...prev, { text: data.response, sender: 'bot' as const }]);
+        typeMessage(botResponse, () => {
+          setMessages(prev => [...prev, { content: botResponse, sender_type: 'bot', created_at: new Date().toISOString() }]);
           setTypingMessage('');
         });
       }, 1000 + Math.random() * 1000);
     } catch (error) {
       console.error('Error sending message:', error);
       setIsBotTyping(false);
-      setMessages(prev => [...prev, { text: "Sorry, I encountered an error. Please try again.", sender: 'bot' as const }]);
+      setMessages(prev => [...prev, { content: "Sorry, I encountered an error. Please try again.", sender_type: 'bot', created_at: new Date().toISOString() }]);
     }
   };
 
@@ -189,8 +296,8 @@ const ResumeSection: React.FC = () => {
             ) : (
               <>
                 {messages.map((message, index) => (
-                  <div key={index} className={`chat-message ${message.sender}`}>
-                    {message.text}
+                  <div key={index} className={`chat-message ${message.sender_type}`}>
+                    {message.content}
                   </div>
                 ))}
                 {isBotTyping && (

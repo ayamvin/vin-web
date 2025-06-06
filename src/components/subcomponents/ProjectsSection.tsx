@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ProjectCard from './ProjectCard.tsx';
 import '../../styles/ProjectsSection.css';
+import { supabase } from './supabaseClient.ts';
 
 interface Project {
   id: number;
@@ -16,9 +17,19 @@ const ProjectsSection: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/projects')
-      .then(res => res.json())
-      .then(data => setProjects(data));
+    const fetchProjects = async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*');
+
+      if (error) {
+        console.error('Error fetching projects:', error);
+      } else {
+        setProjects(data as Project[]);
+      }
+    };
+
+    fetchProjects();
   }, []);
 
   return (
