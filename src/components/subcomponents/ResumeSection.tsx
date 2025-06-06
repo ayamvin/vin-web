@@ -1,13 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { FaDownload, FaEye, FaTimes, FaPaperPlane } from 'react-icons/fa';
 import { Document, Page, pdfjs } from 'react-pdf';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.js';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
 import '../../styles/ResumeSection.css';
 import resumeFile from '../../assets/pdf/resumeManalang.pdf';
 
-
-
-pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+// Configure pdf.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const ResumeSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -15,13 +15,12 @@ const ResumeSection: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [messages, setMessages] = useState<Array<{ text: string; sender: 'user' | 'bot' }>>([]);
   const [inputMessage, setInputMessage] = useState('');
+  const [pdfLoadError, setPdfLoadError] = useState<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // const resumeUrl = '/assets/pdf/resumeManalang.pdf';
-  const resumeUrl = resumeFile;
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.href = resumeUrl;
+    link.href = resumeFile;
     link.download = 'Manalang_Resume.pdf';
     document.body.appendChild(link);
     link.click();
@@ -34,6 +33,12 @@ const ResumeSection: React.FC = () => {
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    setPdfLoadError(null);
+  };
+
+  const onDocumentLoadError = (error: Error) => {
+    console.error('PDF loading error:', error);
+    setPdfLoadError('Failed to load PDF file. Please try downloading instead.');
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
@@ -81,18 +86,19 @@ const ResumeSection: React.FC = () => {
         <div className="resume-preview-container">
           <div className="resume-preview">
             <Document
-              file={resumeUrl}
+              file={resumeFile}
               onLoadSuccess={onDocumentLoadSuccess}
-              onLoadError={(error) => console.error('PDF loading error:', error)}
-              loading={<div>Loading resume...</div>}
-              error={<div>Failed to load resume PDF.</div>}
+              onLoadError={onDocumentLoadError}
+              loading={<div className="pdf-loading">Loading resume preview...</div>}
+              error={<div className="pdf-error">{pdfLoadError || 'Failed to load resume PDF.'}</div>}
             >
               <Page 
                 pageNumber={pageNumber} 
                 width={300}
-                height={800}
+                height={400}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
+                loading={<div className="pdf-loading">Loading page...</div>}
               />
             </Document>
           </div>
@@ -166,22 +172,35 @@ const ResumeSection: React.FC = () => {
             <button onClick={toggleModal} className="close-button">
               <FaTimes />
             </button>
-            <div className="resume-embed">
-              <Document
-                file={resumeUrl}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={(error) => console.error('PDF loading error:', error)}
-                loading={<div>Loading resume...</div>}
-                error={<div>Failed to load resume PDF.</div>}
-              >
-                {Array.from(new Array(numPages || 1)).map((_, index) => (
-                  <Page 
-                    key={`page_${index + 1}`}
-                    pageNumber={index + 1}
-                    width={800}
-                  />
-                ))}
-              </Document>
+            <div className="modal-pdf-container">
+              {pdfLoadError ? (
+                <div className="pdf-error-modal">
+                  {pdfLoadError}
+                  <button onClick={handleDownload} className="download-fallback">
+                    <FaDownload /> Download Resume Instead
+                  </button>
+                </div>
+              ) : (
+                <Document
+                  file={resumeFile}
+                  onLoadSuccess={onDocumentLoadSuccess}
+                  onLoadError={onDocumentLoadError}
+                  loading={<div className="pdf-loading-modal">Loading full resume...</div>}
+                  error={<div className="pdf-error-modal">{pdfLoadError || 'Failed to load resume PDF.'}</div>}
+                >
+                  {Array.from(new Array(numPages || 1), (_, index) => (
+                    <div key={`page_${index + 1}`} className="modal-page-container">
+                      <Page 
+                        pageNumber={index + 1}
+                        width={800}
+                        renderTextLayer={true}
+                        renderAnnotationLayer={true}
+                        loading={<div className="pdf-loading">Loading page {index + 1}...</div>}
+                      />
+                    </div>
+                  ))}
+                </Document>
+              )}
             </div>
           </div>
         </div>
@@ -189,5 +208,5 @@ const ResumeSection: React.FC = () => {
     </section>
   );
 };
-
+// default
 export default ResumeSection;
