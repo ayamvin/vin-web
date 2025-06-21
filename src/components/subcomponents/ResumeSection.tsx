@@ -6,6 +6,7 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 import '../../styles/ResumeSection.css';
 import resumeFile from '../../assets/pdf/resumeManalang.pdf';
 import { supabase } from './supabaseClient.ts';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Configure pdf.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
@@ -177,9 +178,9 @@ const ResumeSection: React.FC = () => {
         user = newUser;
       }
       if (!user) {
-      console.error('User is null');
-      return;
-}
+        console.error('User is null');
+        return;
+      }
 
       // Create conversation
       const { data: conversation } = await supabase
@@ -227,13 +228,32 @@ const ResumeSection: React.FC = () => {
 
   return (
     <section id="resume" className="resume-section">
-      <div className="section-header">
-        <h2 className="section-title">My Resume</h2>
-        <p className="section-subtitle">Professional background and experience</p>
+      <div className="section-resume-header">
+        <motion.h2 
+          className="section-resume-title"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          My Resume
+        </motion.h2>
+        <motion.p 
+          className="section-resume-subtitle"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          Professional background and experience
+        </motion.p>
       </div>
       
       <div className="resume-container">
-        <div className="resume-preview-container">
+        <motion.div 
+          className="resume-preview-container"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           <div className="resume-preview">
             <Document
               file={resumeFile}
@@ -270,16 +290,31 @@ const ResumeSection: React.FC = () => {
           </div>
           
           <div className="resume-actions">
-            <button onClick={handleDownload} className="resume-button">
+            <motion.button 
+              onClick={handleDownload} 
+              className="resume-button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <FaDownload className="button-icon" /> Download PDF
-            </button>
-            <button onClick={toggleModal} className="resume-button">
+            </motion.button>
+            <motion.button 
+              onClick={toggleModal} 
+              className="resume-button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <FaEye className="button-icon" /> View Full Resume
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
         
-        <div className="resume-chatbot">
+        <motion.div 
+          className="resume-chatbot"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           <h3>Resume Assistant</h3>
           <p>Ask about my skills, experience, or qualifications:</p>
           
@@ -296,9 +331,15 @@ const ResumeSection: React.FC = () => {
             ) : (
               <>
                 {messages.map((message, index) => (
-                  <div key={index} className={`chat-message ${message.sender_type}`}>
+                  <motion.div 
+                    key={index} 
+                    className={`chat-message ${message.sender_type}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     {message.content}
-                  </div>
+                  </motion.div>
                 ))}
                 {isBotTyping && (
                   <div className="chat-message bot">
@@ -325,52 +366,73 @@ const ResumeSection: React.FC = () => {
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Ask about my resume..."
             />
-            <button type="submit" disabled={!inputMessage.trim()}>
+            <motion.button 
+              type="submit" 
+              disabled={!inputMessage.trim()}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
               <FaPaperPlane />
-            </button>
+            </motion.button>
           </form>
-        </div>
+        </motion.div>
       </div>
       
-      {showModal && (
-        <div className="resume-modal">
-          <div className="modal-content">
-            <button onClick={toggleModal} className="close-button">
-              <FaTimes />
-            </button>
-            <div className="modal-pdf-container">
-              {pdfLoadError ? (
-                <div className="pdf-error-modal">
-                  {pdfLoadError}
-                  <button onClick={handleDownload} className="download-fallback">
-                    <FaDownload /> Download Resume Instead
-                  </button>
-                </div>
-              ) : (
-                <Document
-                  file={resumeFile}
-                  onLoadSuccess={onDocumentLoadSuccess}
-                  onLoadError={onDocumentLoadError}
-                  loading={<div className="pdf-loading-modal">Loading full resume...</div>}
-                  error={<div className="pdf-error-modal">{pdfLoadError || 'Failed to load resume PDF.'}</div>}
-                >
-                  {Array.from(new Array(numPages || 1), (_, index) => (
-                    <div key={`page_${index + 1}`} className="modal-page-container">
-                      <Page 
-                        pageNumber={index + 1}
-                        width={800}
-                        renderTextLayer={true}
-                        renderAnnotationLayer={true}
-                        loading={<div className="pdf-loading">Loading page {index + 1}...</div>}
-                      />
-                    </div>
-                  ))}
-                </Document>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div 
+            className="resume-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="modal-content"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+            >
+              <motion.button 
+                onClick={toggleModal} 
+                className="close-button"
+                whileHover={{ rotate: 90 }}
+              >
+                <FaTimes />
+              </motion.button>
+              <div className="modal-pdf-container">
+                {pdfLoadError ? (
+                  <div className="pdf-error-modal">
+                    {pdfLoadError}
+                    <button onClick={handleDownload} className="download-fallback">
+                      <FaDownload /> Download Resume Instead
+                    </button>
+                  </div>
+                ) : (
+                  <Document
+                    file={resumeFile}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    onLoadError={onDocumentLoadError}
+                    loading={<div className="pdf-loading-modal">Loading full resume...</div>}
+                    error={<div className="pdf-error-modal">{pdfLoadError || 'Failed to load resume PDF.'}</div>}
+                  >
+                    {Array.from(new Array(numPages || 1), (_, index) => (
+                      <div key={`page_${index + 1}`} className="modal-page-container">
+                        <Page 
+                          pageNumber={index + 1}
+                          width={800}
+                          renderTextLayer={true}
+                          renderAnnotationLayer={true}
+                          loading={<div className="pdf-loading">Loading page {index + 1}...</div>}
+                        />
+                      </div>
+                    ))}
+                  </Document>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

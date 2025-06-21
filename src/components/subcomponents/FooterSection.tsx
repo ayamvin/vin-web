@@ -1,8 +1,35 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaGithub, FaLinkedin, FaTwitter, FaInstagram } from 'react-icons/fa';
 import '../../styles/Footer.css';
 
 const Footer: React.FC = () => {
+    useEffect(() => {
+    const animateFooter = () => {
+      const footerContainer = document.querySelector('.footer-container');
+      const footerLogo = document.querySelector('.footer-logo');
+      const footerText = document.querySelector('.footer-text');
+      const footerSocial = document.querySelector('.footer-social');
+      const footerLinks = document.querySelectorAll('.footer-links li');
+      const newsletterForm = document.querySelector('.newsletter-form');
+      const footerBottom = document.querySelector('.footer-bottom');
+      
+      if (footerContainer) footerContainer.classList.add('animate');
+      if (footerLogo) footerLogo.classList.add('animate');
+      if (footerText) footerText.classList.add('animate');
+      if (footerSocial) footerSocial.classList.add('animate');
+      footerLinks.forEach((link, index) => {
+        setTimeout(() => {
+          link.classList.add('animate');
+        }, index * 100);
+      });
+      if (newsletterForm) newsletterForm.classList.add('animate');
+      if (footerBottom) footerBottom.classList.add('animate');
+    };
+
+    const timer = setTimeout(animateFooter, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <footer className="footer">
       <div className="footer-container">

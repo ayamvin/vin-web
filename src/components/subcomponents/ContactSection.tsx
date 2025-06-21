@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HiOutlineMail, HiOutlineUser, HiOutlineDocumentText } from 'react-icons/hi';
 import '../../styles/ContactSection.css';
 import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
@@ -120,12 +120,27 @@ const ContactSection: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+  useEffect(() => {
+  // Add animate class to header after mount
+  const timer = setTimeout(() => {
+    const header = document.querySelector('.section-contact-header');
+    if (header) header.classList.add('animate');
+    
+    const formGroups = document.querySelectorAll('.form-group');
+    formGroups.forEach(group => group.classList.add('animate'));
+    
+    const contactInfo = document.querySelector('.contact-info');
+    if (contactInfo) contactInfo.classList.add('animate');
+  }, 100);
+  
+  return () => clearTimeout(timer);
+}, []);
 
   return (
     <section id="contact" className="contact-section">
-      <div className="section-header">
-        <h2 className="section-title">Get In Touch</h2>
-        <p className="section-subtitle">Have a project or question? Send me a message</p>
+      <div className="section-contact-header">
+        <h2 className="section-contact-title">Get In Touch</h2>
+        <p className="section-contact-subtitle">Have a project or question? Send me a message</p>
       </div>
       
       <div className="contact-container">

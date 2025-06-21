@@ -112,7 +112,7 @@ const SkillsSection: React.FC = () => {
           >
             <XAxis 
               type="number" 
-              domain={[0, 2.5]} 
+              domain={[0, 5]} 
               tick={{ fill: theme === 'dark' ? '#ccd6f6' : '#333' }}
               tickFormatter={(value) => `${value}y`}
             />
