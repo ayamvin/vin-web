@@ -3,14 +3,14 @@ import { Link } from 'react-scroll';
 import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 import { HiOutlineMail } from 'react-icons/hi';
 import '../../styles/HeroSection.css';
-import developerImage from '../../assets/images/developer.png'; // Adjust the path to your image
+import developerImage from '../../assets/images/vin_bg.png'; // Adjust the path to your image
 
 const HeroSection: React.FC = () => {
   return (
     <section id="hero" className="hero-section">
       <div className="hero-content">
         <h1 className="hero-title">Hi, I'm <span className="highlight">Malvin Manalang</span></h1>
-        <h2 className="hero-subtitle">Full Stack Developer</h2>
+        <h2 className="hero-subtitle">Part Time Full Stack Developer</h2>
         <p className="hero-description">
           I build exceptional digital experiences with modern technologies.
           Currently focused on React, TypeScript, and Node.js applications.
@@ -41,12 +41,12 @@ const HeroSection: React.FC = () => {
         </div>
       </div>
       
-    <div className="hero-image">
-      <div 
-        className="developer-illustration"
-        style={{ backgroundImage: `url(${developerImage})` }}
-      ></div>
-    </div>
+      <div className="hero-image">
+        <div 
+          className="developer-illustration"
+          style={{ backgroundImage: `url(${developerImage})` }}
+        ></div>
+      </div>
     </section>
   );
 };

@@ -15,6 +15,7 @@ interface Project {
 
 const ProjectsSection: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -30,23 +31,46 @@ const ProjectsSection: React.FC = () => {
     };
 
     fetchProjects();
+
+    // Intersection Observer for scroll animation
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const section = document.querySelector('#projects');
+    if (section) observer.observe(section);
+
+    return () => {
+      if (section) observer.unobserve(section);
+    };
   }, []);
 
   return (
-    <section id="projects" className="projects-section">
+    <section id="projects" className={`projects-section ${isVisible ? 'visible' : ''}`}>
       <div className="section-header">
         <h2 className="section-title">My Projects</h2>
-        {/* <p className="section-subtitle">Some of my recent work</p> */}
+        {/* <div className="section-divider"></div> */}
       </div>
       
       <div className="projects-grid">
-        {projects.map(project => (
-          <ProjectCard key={project.id} project={{
-            ...project,
-            githubLink: project.github_link,
-            demoLink: project.demo_link,
-            imageUrl: project.image_url
-          }} />
+        {projects.map((project, index) => (
+          <ProjectCard 
+            key={project.id} 
+            project={{
+              ...project,
+              githubLink: project.github_link,
+              demoLink: project.demo_link,
+              imageUrl: project.image_url
+            }} 
+            animationDelay={index * 0.1}
+          />
         ))}
       </div>
     </section>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import '../../styles/ProjectCard.css';
@@ -15,13 +15,44 @@ interface Project {
 
 interface ProjectCardProps {
   project: Project;
+  animationDelay?: number;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, animationDelay = 0 }) => {
   const { theme } = useTheme();
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      if (cardRef.current) {
+        observer.unobserve(cardRef.current);
+      }
+    };
+  }, []);
 
   return (
-    <div className={`project-card ${theme}`}>
+    <div 
+      ref={cardRef}
+      className={`project-card ${theme}`}
+      style={{
+        '--delay': `${animationDelay}s`
+      } as React.CSSProperties}
+    >
       <div className="project-image-container">
         <img 
           src={project.imageUrl} 

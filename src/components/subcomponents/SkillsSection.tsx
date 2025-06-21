@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
 import '../../styles/SkillsSection.css';
@@ -25,11 +25,13 @@ interface Skills {
 const SkillsSection: React.FC = () => {
   const { theme } = useTheme();
   const [skills, setSkills] = useState<Skills[]>([]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const fetchSkills = async () => {
       const { data, error } = await supabase
-        .from('skills') // your table name in Supabase
+        .from('skills')
         .select('*');
 
       if (error) {
@@ -40,8 +42,25 @@ const SkillsSection: React.FC = () => {
     };
 
     fetchSkills();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+
+    return () => {
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
+    };
   }, []);
-  
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -55,30 +74,35 @@ const SkillsSection: React.FC = () => {
   };
 
   return (
-    <section id="skills" className="skills-section">
+    <section 
+      id="skills" 
+      className={`skills-section ${isVisible ? 'visible' : ''}`}
+      ref={sectionRef}
+    >
       <div className="section-header">
         <h2 className="section-title">My Experience</h2>
         <p className="section-subtitle">Years working with each technology</p>
+        <div className="section-divider"></div>
       </div>
 
-      {/* New Language Cards Container */}
       <div className="language-cards-container">
-        {skills.map((skills) => (
+        {skills.map((skill, index) => (
           <div 
-            key={skills.name}
+            key={skill.name}
             className="language-card"
-            style={{ backgroundColor: languageColors[skills.name] }}
+            style={{ 
+              backgroundColor: languageColors[skill.name],
+              animationDelay: `${index * 0.1}s`
+            }}
           >
             <div className="language-icon">
-              {/* Replace with your actual icon component or img tag */}
-              <span className={`icon-${skills.icon}`}>{skills.icon}</span>
+              <span className={`icon-${skill.icon}`}>{skill.icon}</span>
             </div>
-            <div className="language-name">{skills.name}</div>
+            <div className="language-name">{skill.name}</div>
           </div>
         ))}
       </div>
 
-      {/* Existing Bar Chart */}
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={400}>
           <BarChart

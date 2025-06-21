@@ -8,6 +8,7 @@ import ContactSection from './subcomponents/ContactSection';
 import Footer from './subcomponents/FooterSection';
 import { ThemeContext } from './context/ThemeContext'; // no .tsx extension needed
 import '../styles/MainPage.css';
+// import Hyperspeed from './ReactBits/Hyperspeed';
 
 const MainPage: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');

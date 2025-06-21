@@ -187,6 +187,13 @@ section {
   color: #64ffda;
 }
 
+.orb-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   main {

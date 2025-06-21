@@ -1,40 +1,196 @@
-.skills-section {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0 20px 0 20px;
-  border-bottom: 1px solid rgb(160, 12, 88);
-  /* border: 1px solid wheat; */
+/* Animation Keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.skills-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  border: 1px solid wheat;
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
-/* Chart container */
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Section Styles */
+.skills-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 20px;
+  border-bottom: 1px solid rgb(160, 12, 88);
+  position: relative;
+  overflow: hidden;
+}
+
+.skills-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(160, 12, 88, 0.05) 0%, rgba(61, 106, 255, 0.05) 100%);
+  background-size: 200% 200%;
+  animation: gradientFlow 15s ease infinite;
+  z-index: -1;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
+}
+
+.skills-section.visible .section-header {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  background: linear-gradient(90deg, rgb(160, 12, 88), rgb(61, 106, 255));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+.section-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.8;
+  margin-bottom: 15px;
+}
+
+.section-divider {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, rgb(160, 12, 88), rgb(61, 106, 255));
+  margin: 0 auto;
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.8s ease 0.3s;
+}
+
+.skills-section.visible .section-divider {
+  transform: scaleX(1);
+}
+
+/* Language Cards */
+.language-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin: 2rem auto;
+  max-width: 800px;
+}
+
+.language-card {
+  width: 150px;
+  height: 80px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.skills-section.visible .language-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.language-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+  animation: float 3s ease-in-out infinite;
+}
+
+.language-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.language-name {
+  font-size: 12px;
+  color: white;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Chart Container */
 .chart-container {
   width: 100%;
   max-width: 800px;
-  border: 1px solid rgb(160, 12, 88);
-  box-shadow: 0 10px 20px rgb(0, 0, 0, 0.5);
+  /* margin: 2rem auto; */
+  padding: 1rem;
   border-radius: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease 0.4s;
 }
 
-/* Tooltip styling */
+.skills-section.visible .chart-container {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Tooltip */
 .custom-tooltip {
   padding: 0.75rem;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid wheat;
+  backdrop-filter: blur(5px);
 }
 
 .custom-tooltip.dark {
-  background: #112240;
+  background: rgba(17, 34, 64, 0.9);
   border: 1px solid #64ffda;
 }
 
 .custom-tooltip.light {
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid #3498db;
 }
 
@@ -54,74 +210,98 @@
 .tooltip-value {
   font-size: 0.9rem;
 }
-/* Language Cards Container */
-.language-cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  margin: 2rem auto;
-  max-width: 800px;
-}
 
-.language-card {
-  width: 150px;
-  height: 80px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: default;
-  transition: transform 0.2s ease;
-  border: 1px solid rgb(52, 180, 189);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-}
-
-.language-card:hover {
-  transform: translateY(-3px);
-}
-
-.language-icon {
-  font-size: 24px;
-  margin-bottom: 4px;
-  color: white;
-  text-transform: uppercase;
-  font-weight: bold;
-}
-
-.language-name {
-  font-size: 12px;
-  color: white;
-  font-weight: 500;
-  text-align: center;
-}
-
-/* Dark mode adjustments */
-.skills-section.dark .language-card {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Existing chart styles */
-.chart-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 1rem;
-}
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .chart-container {
-    padding: 0.5rem;
-    height: 300px;
+/* Responsive Styles */
+/* Tablet Landscape (768px - 1024px) */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+  .skills-section {
+    padding: 60px 20px;
   }
   
-  .skills-section .section-header {
-    padding: 0 1rem;
+  .language-card {
+    width: 130px;
+    height: 70px;
+  }
+  
+  .section-title {
+    font-size: 2.2rem;
   }
 }
-@media (max-width: 768px) {
-  .skills-container {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+
+/* Tablet Portrait (568px - 767px) */
+@media only screen and (min-width: 568px) and (max-width: 767px) {
+  .skills-section {
+    padding: 50px 15px;
+  }
+  
+  .language-cards-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .language-card {
+    width: 120px;
+    height: 65px;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+}
+
+/* Mobile Landscape (480px - 567px) */
+@media only screen and (min-width: 480px) and (max-width: 567px) {
+  .skills-section {
+    padding: 40px 10px;
+  }
+  
+  .language-cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .language-card {
+    width: 140px;
+    height: 70px;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+}
+
+/* Mobile Portrait (up to 479px) */
+@media only screen and (max-width: 479px) {
+  .skills-section {
+    padding: 30px 10px;
+  }
+  
+  .language-cards-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .language-card {
+    width: 120px;
+    height: 60px;
+    font-size: 0.9rem;
+  }
+  
+  .section-title {
+    font-size: 1.6rem;
+  }
+  
+  .chart-container {
+    padding: 0;
+  }
+  
+  /* Faster animations on mobile */
+  .language-card {
+    animation-duration: 0.4s;
+  }
+    .chart-container .recharts-yAxis .recharts-text {
+    transform: translateX(0) !important;
+  }
+  
+  .chart-container .recharts-wrapper {
+    margin-left: -100px;
   }
 }
